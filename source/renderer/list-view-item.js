@@ -92,10 +92,6 @@ class ListViewItem
         if(!this._snippets) {
             this._elem.find('.snippet').first().addClass('hidden');
         }
-
-        // Attach to element and activate listeners
-        this._listview.getContainer().append(this._elem);
-        this._act();
     }
 
     /**
@@ -299,6 +295,19 @@ class ListViewItem
     {
         this._snippets = !this._snippets;
         this._elem.find('.snippet').toggleClass('hidden');
+        return this;
+    }
+
+    /**
+     * Attaches the DOM element to the list.
+     * @return {ListViewItem} Chainability.
+     */
+    attach()
+    {
+        // Attach to element and activate listeners
+        this._listview.getContainer().append(this._elem);
+        this._act();
+
         return this;
     }
 

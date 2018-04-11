@@ -35,6 +35,22 @@ class ListView
         this._li = [];
         this._snippets = snippets;
         this._liSelected = null;
+        this._directoryHeight = 0;
+        this._fileHeight = 0;
+        this._countFiles = 0;
+        this._countDirs = 0;
+        this._renderedIndex = 0; // Holds the latest index that has been rendered
+
+        // Find the heights
+        let testing = $('<li>').addClass('directory').text('test').appendTo(this._container);
+        this._directoryHeight = testing.outerHeight();
+        testing.detach();
+        testing.removeClass('directory').addClass('file').append($('<strong>').text('test')));
+        .append($('<br>'));
+        .append($('<span>').addClass('snippet').text('test').append($('<br>')).append($('<small>').text('test')));
+        testing.appendTo(this._container);
+        this._fileHeight = testing.outerHeight();
+        testing.detach();
 
         // Activate arrow key navigation
         this._activate();
@@ -90,6 +106,11 @@ class ListView
         // First detach all list items that are no longer present
         for(let li of this._li) {
             if(!nData.find((element) => {return (element.hash == li.getHash());})) {
+                if(li.isDir()) {
+                    this._countDirs--;
+                } else if(li.isFile()) {
+                    this._countFiles--;
+                }
                 li.detach();
             }
         }
@@ -110,6 +131,11 @@ class ListView
                 // Not found -> insert. The items will be inserted immediately
                 // at the end of the list.
                 target[i] = new ListViewItem(this, nData[i], this._snippets);
+                if(target[i].isFile()) {
+                    this._countFiles++;
+                } else if(target[i].isDir()) {
+                    this._countDirs++;
+                }
             }
 
             // Save the target position
@@ -118,6 +144,12 @@ class ListView
 
         // Swap the old list with the new
         this._li = target;
+
+        // TODO: Here, we need to render just as many elements as we would need.
+        // First: Set the new container height
+        let h = this._countFiles * this._fileHeight + this._countDirs * this._directoryHeight;
+        this._container.css('height', h + 'px');
+
 
         for(let li of this._li) {
             li.moveToTarget();
